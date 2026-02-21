@@ -1,12 +1,8 @@
-import os
 import pytest
 import requests
-from dotenv import load_dotenv
-
-# Load environment variables
-load_dotenv()
-BASE_URL = os.getenv("BASE_URL")
-API_KEY = os.getenv("API_KEY")
+from utils.recipe_factory import RecipeFactory
+from utils.api_helper import RecipeAPIHelper
+from utils.config import BASE_URL, API_KEY, RECIPES_ENDPOINT
 
 
 # === FIXTURES ===
@@ -20,7 +16,7 @@ def api_headers():
 @pytest.fixture
 def recipes_endpoint():
     """Fixture that provides the recipes endpoint URL."""
-    return f"{BASE_URL}/collections/recipes/records"
+    return RECIPES_ENDPOINT
 
 
 @pytest.fixture
@@ -30,3 +26,14 @@ def api_client(api_headers):
     session.headers.update(api_headers)
     return session
 
+
+@pytest.fixture
+def recipe_factory():
+    """Fixture that provides the RecipeFactory for generating test data."""
+    return RecipeFactory
+
+
+@pytest.fixture
+def api_helper():
+    """Fixture that provides a RecipeAPIHelper instance."""
+    return RecipeAPIHelper(BASE_URL, API_KEY)
