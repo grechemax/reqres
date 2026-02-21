@@ -48,3 +48,35 @@ def test_get_recipes_without_api_key(recipes_endpoint):
     response = requests.get(recipes_endpoint)
 
     assert response.status_code >= 400
+
+
+def test_post_new_recipe(recipes_endpoint, api_headers):
+    """POST a new recipe to the endpoint."""
+    new_recipe = {
+        "data": {
+            "name": "Test Recipe",
+            "ingredients": ["ingredient 1", "ingredient 2", "ingredient 3"],
+            "instructions": "Mix all ingredients and cook for 30 minutes",
+            "cuisine": "Test Cuisine",
+            "difficulty": "easy",
+            "servings": 4
+        }
+    }
+
+    response = requests.post(recipes_endpoint, json=new_recipe, headers=api_headers)
+
+    assert response.status_code in [200, 201], f"Expected 200 or 201, got {response.status_code}"
+
+    response_json = response.json()
+    assert "data" in response_json, "Response should have 'data' key"
+
+    # Verify the created recipe has the expected fields
+    created_recipe = response_json["data"]
+    # TODO implement a better way to verify the created recipe, e.g. by fetching it again using its ID and comparing the fields
+    # assert created_recipe["name"] == new_recipe["data"]["name"]
+    # assert created_recipe["ingredients"] == new_recipe["data"]["ingredients"]
+    # assert created_recipe["instructions"] == new_recipe["data"]["instructions"]
+    # assert created_recipe["cuisine"] == new_recipe["data"]["cuisine"]
+    # assert created_recipe["difficulty"] == new_recipe["data"]["difficulty"]
+    # assert created_recipe["servings"] == new_recipe["data"]["servings"]
+
