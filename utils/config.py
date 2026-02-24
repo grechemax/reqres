@@ -10,7 +10,7 @@ BASE_URL = os.getenv("BASE_URL")
 API_KEY = os.getenv("API_KEY")
 
 # Endpoint paths
-RECIPES_PATH = "/collections/temp/records"
+RECIPES_PATH = "/collections/recipes/records"
 
 # Constructed endpoints
 RECIPES_ENDPOINT = f"{BASE_URL}{RECIPES_PATH}"
