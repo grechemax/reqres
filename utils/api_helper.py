@@ -41,3 +41,15 @@ class RecipeAPIHelper:
         for recipe_id in recipe_ids:
             self.delete_recipe(recipe_id)
 
+    def delete_all_recipes(self) -> None:
+        """Delete all recipes from the collection."""
+        response = self.get_all_recipes()
+        if response.status_code == 200:
+            response_json = response.json()
+            if "data" in response_json:
+                recipes = response_json["data"]
+                for record in recipes:
+                    # Extract recipe ID from the record
+                    if "id" in record:
+                        self.delete_recipe(record["id"])
+
