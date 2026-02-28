@@ -1,116 +1,152 @@
 """Factory for generating test recipe data."""
 import random
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 
 from utils.recipe_samples import SAMPLE_RECIPES
 
 
 class RecipeFactory:
-    """Factory class for creating test recipe data."""
+    """
+    Factory class for creating test recipe data with explicit, no-default parameters.
 
-    CUISINES = ["Italian", "Chinese", "Mexican", "Japanese", "French", "Indian", "Thai", "American"]
-    DIFFICULTIES = ["Easy", "Medium", "Hard"]
-    MEAL_TYPES = ["Breakfast", "Lunch", "Dinner", "Snack", "Dessert"]
+    All parameters must be explicitly provided by tests to ensure clarity and control
+    over test data. No hidden defaults are applied by the factory.
+    """
+
+    @staticmethod
+    def _wrap_recipe(recipe_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Wrap recipe data in the reqres API format.
+
+        Args:
+            recipe_data: The recipe dictionary to wrap
+
+        Returns:
+            Recipe wrapped in "data" key as required by reqres API
+        """
+        return {"data": recipe_data}
 
     @staticmethod
     def create_recipe(
-        name: Optional[str] = None,
-        cuisine: Optional[str] = None,
-        difficulty: Optional[str] = None,
-        servings: Optional[int] = None,
-        tags: Optional[List[str]] = None,
-        ingredients: Optional[List[str]] = None,
-        instructions: Optional[List[str]] = None,
-        **kwargs
+        name: str,
+        cuisine: str,
+        difficulty: str,
+        servings: int,
+        ingredients: List[str],
+        instructions: List[str],
+        tags: List[str],
+        mealType: List[str],
+        prepTimeMinutes: int,
+        cookTimeMinutes: int,
+        caloriesPerServing: int
     ) -> Dict[str, Any]:
         """
-        Create a recipe with optional custom fields.
+        Create a detailed recipe with all explicit parameters.
+
+        This method requires all parameters to be explicitly provided - no defaults.
+        Use this for creating recipes with specific test values.
 
         Args:
-            name: Recipe name
-            cuisine: Cuisine type
-            difficulty: Difficulty level (Easy, Medium, Hard)
-            servings: Number of servings
-            tags: List of tags
-            ingredients: List of ingredients
-            instructions: List of instruction steps
-            **kwargs: Any additional fields to include
+            name: Recipe name (e.g., "Spaghetti Carbonara")
+            cuisine: Cuisine type (e.g., "Italian", "Thai")
+            difficulty: Difficulty level (e.g., "Easy", "Medium", "Hard")
+            servings: Number of servings (e.g., 4)
+            ingredients: List of ingredient strings (e.g., ["pasta", "eggs", "bacon"])
+            instructions: List of instruction steps (e.g., ["Boil water", "Cook pasta"])
+            tags: List of recipe tags (e.g., ["Pasta", "Quick", "Vegetarian"])
+            mealType: List of meal types (e.g., ["Dinner", "Lunch"])
+            prepTimeMinutes: Preparation time in minutes (e.g., 10)
+            cookTimeMinutes: Cooking time in minutes (e.g., 20)
+            caloriesPerServing: Calories per serving (e.g., 450)
 
         Returns:
             Dictionary with recipe data wrapped in "data" key (reqres format)
         """
-        # Use random sample as base if no name provided
-        base_recipe = random.choice(SAMPLE_RECIPES).copy()
-
         recipe = {
-            "name": name or base_recipe["name"],
-            "cuisine": cuisine or base_recipe["cuisine"],
-            "difficulty": difficulty or base_recipe["difficulty"],
-            "servings": servings or base_recipe["servings"],
-            "tags": tags or base_recipe["tags"],
-            "ingredients": ingredients or base_recipe["ingredients"],
-            "instructions": instructions or base_recipe["instructions"],
-            "mealType": base_recipe.get("mealType", ["Dinner"]),
-            "prepTimeMinutes": base_recipe.get("prepTimeMinutes", 15),
-            "cookTimeMinutes": base_recipe.get("cookTimeMinutes", 20),
-            "caloriesPerServing": base_recipe.get("caloriesPerServing", 400),
-            "rating": base_recipe.get("rating", 4.5),
-            "userId": random.randint(100, 999),
-            "reviewCount": random.randint(10, 100),
-            "image": f"https://cdn.dummyjson.com/recipe-images/{random.randint(1, 50)}.webp"
+            "name": name,
+            "cuisine": cuisine,
+            "difficulty": difficulty,
+            "servings": servings,
+            "ingredients": ingredients,
+            "instructions": instructions,
+            "tags": tags,
+            "mealType": mealType,
+            "prepTimeMinutes": prepTimeMinutes,
+            "cookTimeMinutes": cookTimeMinutes,
+            "caloriesPerServing": caloriesPerServing,
         }
+        return RecipeFactory._wrap_recipe(recipe)
 
-        # Override with any additional kwargs
-        recipe.update(kwargs)
+    @staticmethod
+    def create_random_recipe() -> Dict[str, Any]:
+        """
+        Create a random recipe from predefined sample templates.
 
-        # Wrap in "data" key as required by reqres API
-        return {"data": recipe}
+        This method selects a random recipe from SAMPLE_RECIPES with all fields
+        already populated. Use this for quick random testing without specifying
+        individual parameters.
+
+        Returns:
+            Dictionary with random recipe data wrapped in "data" key
+        """
+        base_recipe = random.choice(SAMPLE_RECIPES).copy()
+        return RecipeFactory._wrap_recipe(base_recipe)
 
     @staticmethod
     def create_simple_recipe(
-        name: str = "Test Recipe",
-        ingredients: Optional[List[str]] = None,
-        instructions: Optional[str] = None
+        name: str,
+        ingredients: List[str],
+        instructions: str,
+        cuisine: str = "Test Cuisine",
+        difficulty: str = "easy",
+        servings: int = 4
     ) -> Dict[str, Any]:
         """
-        Create a minimal recipe for simple testing.
+        Create a minimal recipe with only essential fields.
+
+        This method is for simple unit tests that focus on name, ingredients,
+        and instructions. Other fields have sensible test defaults.
 
         Args:
-            name: Recipe name
-            ingredients: List of ingredients (defaults to generic list)
-            instructions: Instructions string (defaults to generic instructions)
+            name: Recipe name (required)
+            ingredients: List of ingredients (required)
+            instructions: Instructions as a single string (required)
+            cuisine: Cuisine type (default: "Test Cuisine")
+            difficulty: Difficulty level (default: "easy")
+            servings: Number of servings (default: 4)
 
         Returns:
             Dictionary with minimal recipe data wrapped in "data" key
         """
-        return {
-            "data": {
-                "name": name,
-                "ingredients": ingredients or ["ingredient 1", "ingredient 2", "ingredient 3"],
-                "instructions": instructions or "Mix all ingredients and cook for 30 minutes",
-                "cuisine": "Test Cuisine",
-                "difficulty": "easy",
-                "servings": 4
-            }
+        recipe = {
+            "name": name,
+            "ingredients": ingredients,
+            "instructions": instructions,
+            "cuisine": cuisine,
+            "difficulty": difficulty,
+            "servings": servings
         }
+        return RecipeFactory._wrap_recipe(recipe)
 
     @staticmethod
     def create_bulk_recipes(count: int = 5) -> List[Dict[str, Any]]:
         """
-        Create multiple recipes for bulk testing.
+        Create multiple random recipes for bulk testing.
+
+        Each recipe is assigned a unique name by appending "(Test N)" to make
+        them distinguishable in tests.
 
         Args:
-            count: Number of recipes to create
+            count: Number of recipes to create (default: 5)
 
         Returns:
-            List of recipe dictionaries
+            List of recipe dictionaries, each with unique names
         """
         recipes = []
         for i in range(count):
-            base = random.choice(SAMPLE_RECIPES)
-            recipe = RecipeFactory.create_recipe(
-                name=f"{base['name']} (Test {i+1})"
-            )
+            recipe = RecipeFactory.create_random_recipe()
+            # Make name unique for bulk testing
+            recipe["data"]["name"] = f"{recipe['data']['name']} (Test {i+1})"
             recipes.append(recipe)
         return recipes
 
@@ -119,10 +155,20 @@ class RecipeFactory:
         """
         Create a recipe with only specified fields (for negative testing).
 
+        This is useful for testing API validation - you can omit required fields
+        to verify the API properly rejects invalid recipes.
+
         Args:
-            **provided_fields: Only the fields you want to include
+            **provided_fields: Only the fields you want to include in the recipe
 
         Returns:
             Dictionary with only provided fields wrapped in "data" key
+
+        Example:
+            # Create recipe missing the 'ingredients' field
+            recipe = RecipeFactory.create_recipe_with_missing_fields(
+                name="Incomplete Recipe",
+                instructions=["Step 1"]
+            )
         """
-        return {"data": provided_fields}
+        return RecipeFactory._wrap_recipe(provided_fields)
