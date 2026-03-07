@@ -2,7 +2,7 @@ import pytest
 from typing import Dict, Any, List
 from utils.recipe_factory import RecipeFactory
 from utils.api_helper import RecipeAPIHelper
-from utils.config import BASE_URL, API_KEY
+from utils.config import API_KEY
 
 
 # === HELPER FUNCTIONS ===
@@ -52,12 +52,12 @@ def recipe_factory():
 @pytest.fixture
 def api_helper():
     """Fixture that provides a RecipeAPIHelper instance."""
-    return RecipeAPIHelper(BASE_URL, API_KEY)
+    return RecipeAPIHelper(API_KEY)
 
 
-@pytest.fixture(autouse=True)
-def cleanup_recipes_after_test(api_helper):
-    """Automatically delete all recipes after each test."""
-    yield
-    # Cleanup after test completes
-    api_helper.delete_all_recipes()
+# @pytest.fixture(autouse=True)
+# def cleanup_recipes_after_test(api_helper):
+#     """Automatically delete all recipes after each test."""
+#     yield
+#     # Cleanup after test completes
+#     api_helper.delete_all_recipes()
