@@ -49,15 +49,25 @@ def recipe_factory():
     return RecipeFactory
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def api_helper():
     """Fixture that provides a RecipeAPIHelper instance."""
     return RecipeAPIHelper(API_KEY)
 
 
-# @pytest.fixture(autouse=True)
-# def cleanup_recipes_after_test(api_helper):
-#     """Automatically delete all recipes after each test."""
-#     yield
-#     # Cleanup after test completes
-#     api_helper.delete_all_recipes()
+def pytest_addoption(parser):
+    parser.addoption(
+        "--cleanup-recipes",
+        action="store_true",
+        default=False,
+        help="Delete all recipes after test session",
+    )
+
+
+@pytest.fixture(scope="session", autouse=True)
+def cleanup_recipes_after_test(request, api_helper):
+    """Optionally delete all recipes after all tests."""
+    yield
+    if request.config.getoption("--cleanup-recipes"):
+        api_helper.delete_all_recipes()
+
