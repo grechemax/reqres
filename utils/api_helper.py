@@ -1,7 +1,13 @@
 """Helper functions for API operations with recipes."""
 import requests
+import json
+import logging
 from typing import Dict, Any, List
 from .config import RECIPES_ENDPOINT
+
+# Setup logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 
 class RecipeAPIHelper:
@@ -25,11 +31,22 @@ class RecipeAPIHelper:
 
     def get_recipe_by_id(self, recipe_id: str) -> requests.Response:
         url = f"{self.recipes_endpoint}/{recipe_id}"
-        return requests.get(url, headers=self.headers)
+        logger.info(f"GET_RECIPE_BY_ID - URL: {url}")
+        response = requests.get(url, headers=self.headers)
+        logger.info(f"GET_RECIPE_BY_ID - RESPONSE STATUS: {response.status_code}")
+        logger.info(f"GET_RECIPE_BY_ID - RESPONSE BODY: {response.text}")
+        return response
 
     def update_recipe(self, recipe_id: str, recipe_data: Dict[str, Any]) -> requests.Response:
         url = f"{self.recipes_endpoint}/{recipe_id}"
-        return requests.patch(url, json=recipe_data, headers=self.headers)
+        headers = {**self.headers, "Content-Type": "application/json"}
+        logger.info(f"UPDATE_RECIPE - URL: {url}")
+        logger.info(f"UPDATE_RECIPE - PAYLOAD: {json.dumps(recipe_data, indent=2)}")
+        logger.info(f"UPDATE_RECIPE - HEADERS: {headers}")
+        response = requests.patch(url, json=recipe_data, headers=headers)
+        logger.info(f"UPDATE_RECIPE - RESPONSE STATUS: {response.status_code}")
+        logger.info(f"UPDATE_RECIPE - RESPONSE BODY: {response.text}")
+        return response
 
     def delete_recipe(self, recipe_id: str) -> requests.Response:
         url = f"{self.recipes_endpoint}/{recipe_id}"
